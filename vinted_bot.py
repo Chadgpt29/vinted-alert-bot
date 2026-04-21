@@ -1,6 +1,5 @@
 import requests
 import time
-import json
 
 # ==============================
 # CONFIG
@@ -9,23 +8,133 @@ TELEGRAM_TOKEN = "8553987501:AAH_J85q0eUNUxPZCoW262X-GzBIrYzvGpM"
 CHAT_ID = "7436219935"
 SCAN_INTERVAL = 60  # secondes entre chaque scan
 
-# Tes alertes — modifie selon tes recherches
 ALERTS = [
     {
-        "name": "Levi's",
-        "query": "levis",
-        "size": "",       # ex: "S", "M", "L" ou "" pour toutes
-        "price_max": "",  # ex: "50" ou "" pour pas de limite
-        "category": "1206",  # 1206 = Pantalons & Jeans
+        "name": "Levi's 512",
+        "query": "levis 512",
+        "size": "",
+        "price_max": "70",
+        "category": "1206",
     },
     {
-        "name": "Nike Air Max",
-        "query": "nike air max",
+        "name": "G-Star",
+        "query": "g star jeans pantalon",
         "size": "",
-        "price_max": "80",
-        "category": "",
+        "price_max": "25",
+        "category": "1206",
     },
-    # Ajoute autant d'alertes que tu veux ici !
+    {
+        "name": "Ed Hardy",
+        "query": "ed hardy jeans pantalon",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Dolce & Gabbana",
+        "query": "dolce gabbana jeans pantalon",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Hilfiger Denim",
+        "query": "hilfiger denim jeans pantalon",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Diesel",
+        "query": "diesel jeans pantalon",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Armani",
+        "query": "armani jeans pantalon",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Camp David",
+        "query": "camp david jeans pantalon",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Prada",
+        "query": "prada jeans pantalon",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Baggy Pants",
+        "query": "baggy pants jeans",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Levi's 567 Loose Boot Cut",
+        "query": "levis 567 loose boot cut",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Revenue La Fam",
+        "query": "revenue la fam jeans",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Teddy Smith",
+        "query": "teddy smith jeans pantalon",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Coolcat",
+        "query": "coolcat jeans pantalon",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Ralph Lauren",
+        "query": "ralph lauren jeans pantalon",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Marithe Girbaud",
+        "query": "marithe francois girbaud jeans",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Maison Margiela",
+        "query": "maison margiela jeans pantalon",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
+    {
+        "name": "Lee",
+        "query": "lee jeans pantalon",
+        "size": "",
+        "price_max": "25",
+        "category": "1206",
+    },
 ]
 
 # ==============================
@@ -94,7 +203,7 @@ def format_message(item, alert_name):
 
 def run():
     print("🚀 VintedAlert Bot démarré !")
-    send_telegram("✅ <b>VintedAlert Bot démarré !</b>\nJe vais te notifier dès qu'un nouvel article correspond à tes alertes.")
+    send_telegram("✅ <b>VintedAlert Bot démarré !</b>\nJe surveille 18 marques de jeans/pantalons pour toi 24h/24 !")
     
     scan_count = 0
     
@@ -103,7 +212,7 @@ def run():
         print(f"\n--- Scan #{scan_count} ---")
         
         for alert in ALERTS:
-            print(f"🔍 Scan : {alert['name']}...")
+            print(f"Scan : {alert['name']}...")
             items = scan_vinted(alert)
             new_count = 0
             
@@ -111,16 +220,16 @@ def run():
                 item_id = item.get("id")
                 if item_id and item_id not in seen_ids:
                     seen_ids.add(item_id)
-                    if scan_count > 1:  # pas de notif au premier scan (évite le flood)
+                    if scan_count > 1:
                         msg = format_message(item, alert["name"])
                         send_telegram(msg)
                         new_count += 1
-                        time.sleep(0.5)  # petit délai entre les messages
+                        time.sleep(0.5)
             
-            print(f"  → {len(items)} articles trouvés, {new_count} nouveaux")
-            time.sleep(2)  # délai entre chaque alerte
+            print(f"  -> {len(items)} articles, {new_count} nouveaux")
+            time.sleep(2)
         
-        print(f"⏳ Prochain scan dans {SCAN_INTERVAL} secondes...")
+        print(f"Prochain scan dans {SCAN_INTERVAL} secondes...")
         time.sleep(SCAN_INTERVAL)
 
 if __name__ == "__main__":
