@@ -1,235 +1,91 @@
 import requests
 import time
 
-# ==============================
-# CONFIG
-# ==============================
 TELEGRAM_TOKEN = "8553987501:AAH_J85q0eUNUxPZCoW262X-GzBIrYzvGpM"
 CHAT_ID = "7436219935"
-SCAN_INTERVAL = 60  # secondes entre chaque scan
+SCAN_INTERVAL = 60
 
 ALERTS = [
-    {
-        "name": "Levi's 512",
-        "query": "levis 512",
-        "size": "",
-        "price_max": "70",
-        "category": "1206",
-    },
-    {
-        "name": "G-Star",
-        "query": "g star jeans pantalon",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Ed Hardy",
-        "query": "ed hardy jeans pantalon",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Dolce & Gabbana",
-        "query": "dolce gabbana jeans pantalon",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Hilfiger Denim",
-        "query": "hilfiger denim jeans pantalon",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Diesel",
-        "query": "diesel jeans pantalon",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Armani",
-        "query": "armani jeans pantalon",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Camp David",
-        "query": "camp david jeans pantalon",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Prada",
-        "query": "prada jeans pantalon",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Baggy Pants",
-        "query": "baggy pants jeans",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Levi's 567 Loose Boot Cut",
-        "query": "levis 567 loose boot cut",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Revenue La Fam",
-        "query": "revenue la fam jeans",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Teddy Smith",
-        "query": "teddy smith jeans pantalon",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Coolcat",
-        "query": "coolcat jeans pantalon",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Ralph Lauren",
-        "query": "ralph lauren jeans pantalon",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Marithe Girbaud",
-        "query": "marithe francois girbaud jeans",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Maison Margiela",
-        "query": "maison margiela jeans pantalon",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
-    {
-        "name": "Lee",
-        "query": "lee jeans pantalon",
-        "size": "",
-        "price_max": "25",
-        "category": "1206",
-    },
+    {"name": "Levi's 512", "query": "levis 512", "price_max": "70", "category": "1206"},
+    {"name": "G-Star", "query": "g star jeans", "price_max": "25", "category": "1206"},
+    {"name": "Ed Hardy", "query": "ed hardy jeans", "price_max": "25", "category": "1206"},
+    {"name": "Dolce Gabbana", "query": "dolce gabbana jeans", "price_max": "25", "category": "1206"},
+    {"name": "Diesel", "query": "diesel jeans", "price_max": "25", "category": "1206"},
+    {"name": "Armani", "query": "armani jeans", "price_max": "25", "category": "1206"},
+    {"name": "Ralph Lauren", "query": "ralph lauren jeans", "price_max": "25", "category": "1206"},
+    {"name": "Lee", "query": "lee jeans", "price_max": "25", "category": "1206"},
+    {"name": "Levi's 567", "query": "levis 567", "price_max": "25", "category": "1206"},
+    {"name": "Marithe Girbaud", "query": "marithe girbaud jeans", "price_max": "25", "category": "1206"},
+    {"name": "Maison Margiela", "query": "maison margiela jeans", "price_max": "25", "category": "1206"},
+    {"name": "Teddy Smith", "query": "teddy smith jeans", "price_max": "25", "category": "1206"},
 ]
-
-# ==============================
-# FONCTIONS
-# ==============================
 
 seen_ids = set()
 
-def build_url(alert):
-    url = f"https://www.vinted.fr/api/v2/items?search_text={requests.utils.quote(alert['query'])}&order=newest_first&per_page=20"
-    if alert.get("price_max"):
-        url += f"&price_to={alert['price_max']}"
-    if alert.get("category"):
-        url += f"&catalog_ids[]={alert['category']}"
-    return url
-
 def send_telegram(message):
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage"
-    data = {
-        "chat_id": CHAT_ID,
-        "text": message,
-        "parse_mode": "HTML",
-        "disable_web_page_preview": False
-    }
     try:
-        requests.post(url, data=data, timeout=10)
+        requests.post(url, data={"chat_id": CHAT_ID, "text": message, "parse_mode": "HTML"}, timeout=10)
     except Exception as e:
         print(f"Erreur Telegram: {e}")
 
 def scan_vinted(alert):
     headers = {
-        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1",
-        "Accept": "application/json, text/plain, */*",
+        "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15",
+        "Accept": "application/json",
         "Accept-Language": "fr-FR,fr;q=0.9",
         "Referer": "https://www.vinted.fr/",
-        "X-Requested-With": "XMLHttpRequest",
     }
+    url = f"https://www.vinted.fr/api/v2/items?search_text={requests.utils.quote(alert['query'])}&order=newest_first&per_page=20&price_to={alert.get('price_max','')}&catalog_ids[]={alert.get('category','')}"
     try:
-        url = build_url(alert)
         resp = requests.get(url, headers=headers, timeout=15)
-        if resp.status_code != 200:
-            print(f"Erreur HTTP {resp.status_code} pour {alert['name']}")
+        print(f"  {alert['name']}: HTTP {resp.status_code}")
+        if resp.status_code == 200:
+            return resp.json().get("items", [])
+        else:
+            print(f"  Réponse: {resp.text[:200]}")
             return []
-        data = resp.json()
-        return data.get("items", [])
     except Exception as e:
-        print(f"Erreur scan {alert['name']}: {e}")
+        print(f"  Erreur: {e}")
         return []
 
-def format_message(item, alert_name):
-    title = item.get("title", "Article sans titre")
-    price = item.get("price_numeric") or item.get("price", "?")
-    size = item.get("size_title", "")
-    brand = item.get("brand_title", "")
-    url = f"https://www.vinted.fr/items/{item['id']}"
-    
-    msg = f"🔔 <b>Nouvelle annonce — {alert_name}</b>\n\n"
-    msg += f"👕 <b>{title}</b>\n"
-    if brand:
-        msg += f"🏷 Marque : {brand}\n"
-    if size:
-        msg += f"📐 Taille : {size}\n"
-    msg += f"💶 Prix : <b>{price} €</b>\n"
-    msg += f"\n🔗 <a href='{url}'>Voir l'article</a>"
-    return msg
-
 def run():
-    print("🚀 VintedAlert Bot démarré !")
-    send_telegram("✅ <b>VintedAlert Bot démarré !</b>\nJe surveille 18 marques de jeans/pantalons pour toi 24h/24 !")
+    print("Bot démarré !")
+    send_telegram("✅ Bot démarré — test de connexion Vinted en cours...")
+    
+    # Test immédiat
+    test = scan_vinted({"name": "Test", "query": "levis", "price_max": "50", "category": "1206"})
+    if test:
+        send_telegram(f"✅ Vinted répond ! {len(test)} articles trouvés pour 'levis'. Le bot va maintenant surveiller tes alertes.")
+    else:
+        send_telegram("❌ Vinted bloque les requêtes depuis ce serveur. Le bot ne peut pas fonctionner ainsi.")
     
     scan_count = 0
-    
     while True:
         scan_count += 1
         print(f"\n--- Scan #{scan_count} ---")
+        total_new = 0
         
         for alert in ALERTS:
-            print(f"Scan : {alert['name']}...")
             items = scan_vinted(alert)
-            new_count = 0
-            
             for item in items:
                 item_id = item.get("id")
                 if item_id and item_id not in seen_ids:
                     seen_ids.add(item_id)
                     if scan_count > 1:
-                        msg = format_message(item, alert["name"])
+                        price = item.get("price_numeric") or item.get("price", "?")
+                        title = item.get("title", "Sans titre")
+                        size = item.get("size_title", "")
+                        url = f"https://www.vinted.fr/items/{item_id}"
+                        msg = f"🔔 <b>{alert['name']}</b>\n👕 {title}\n📐 {size}\n💶 <b>{price}€</b>\n🔗 <a href='{url}'>Voir</a>"
                         send_telegram(msg)
-                        new_count += 1
+                        total_new += 1
                         time.sleep(0.5)
-            
-            print(f"  -> {len(items)} articles, {new_count} nouveaux")
             time.sleep(2)
         
-        print(f"Prochain scan dans {SCAN_INTERVAL} secondes...")
+        if scan_count == 2:
+            send_telegram(f"📊 Scan #{scan_count} terminé — {total_new} nouveaux articles trouvés.")
+        
         time.sleep(SCAN_INTERVAL)
 
 if __name__ == "__main__":
